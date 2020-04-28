@@ -8,7 +8,7 @@ Created on Mon Apr 27 12:35:59 2020
 import pandas as pd
 import os
 
-prefix = "C:\\Users\\Richard Wang\\Documents\\UVA 3 - Spring\\Information Retrieval Final Project\\classes\\data\\csvs\\"
+prefix = "C:\\Users\\Richard Wang\\Documents\\UVA 3 - Spring\\Information-Retrieval-Final-Project\\classes\\data\\csvs\\"
 
 class book:
     def __init__(self):
