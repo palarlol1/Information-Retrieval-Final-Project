@@ -14,7 +14,7 @@ Simple content based recommendation System
 '''
 
 class TFIDF:
-    def __init__(self, bookList, numResults = 25):  # added a default value for numResults
+    def __init__(self, bookList, numResults = 35):  # added a default value for numResults
         self.guardWeight = 3
         self.invertedIndex = defaultdict(set)
         self.tagCounter = defaultdict(int)

@@ -85,4 +85,27 @@ with open("exported_data.csv", "w+") as writeFile:
             for minor in minorKeys:
                 line.append(str(dataSet[major][minor]))
         writeFile.write(",".join(line) + "\n")
-        
+
+
+#Since we previously found out that the BEST method is to use the the proability guard, we will see
+#if we can train the weight somehow.
+
+collectedData = [["Weight", "Spam MAP", "Pure MAP"]]
+w = 1
+tfidfAlgorithm.guard = "probability"
+while w <= 7:
+    spam = 0
+    pure = 0
+    for i in range(len(users)):
+        guardedRecommendations = tfidfAlgorithm.recommend(users[i].likes)
+        spam += e.evaluate(guardedRecommendations, spammerBooks)["average precision"]
+        pure += e.evaluate(guardedRecommendations, pureRecommendations[i])["average precision"]
+    spam /= len(users)
+    pure /= len(users)
+    collectedData.append([str(w), str(spam), str(pure)])
+    w += .1
+    tfidfAlgorith.guardWeight = w
+    
+with open("weight_training.csv", "w+") as writeFile:
+    for line in collectedData:
+        writeFile.write(",".join(line) + "\n")
