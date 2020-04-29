@@ -1,11 +1,12 @@
 from classes.data.dataPuller import pull_book_list
 from classes.spamMaker import spammer
 from classes.recommendationAlgorithms import TFIDF, nearestNeighbor, hybrid
+from classes.evaluationAlgorithms import evaluator
 import math
 import random
 
 
-TESTTIMES = 1
+TESTTIMES = 50
 
 class user:
     def __init__(self):
@@ -24,27 +25,64 @@ Threat Model:
     In the interest of fairness, we will be randomizing the user's liked books. 
     This way, we can also run multiple trials
 '''
+#Now we're going to create the recommendation algorithms
+tfidfAlgorithm = TFIDF(data)
+#Holding off on the algorithms until we implement guards
+#nnAlgorithm = nearestNeighbor(data)
+#hybridAlgorithm = hybrid(data)
+
+#Storing in a list for easy access
 
 #Generating our users and their corresponding spamTargeters
 users = []
 spammers = []
+pureRecommendations = []
 for i in range(TESTTIMES):
     users.append(user())
     users[-1].likes = [data[key] for key in users[-1].likes]
     spammers.append(spammer(users[-1].likes, i))
+    pureRecommendations.append(tfidfAlgorithm.recommend(users[-1].likes))
 
 
-#Now we're going to create the recommendation algorithms
-tfidfAlgorithm = TFIDF(data)
-nnAlgorithm = nearestNeighbor(data)
-hybridAlgorithm = hybrid(data)
-
-#Storing in a list for easy access
-algorithms = [tfidfAlgorithm, nnAlgorithm, hybridAlgorithm]
-
+spammerBooks = []
 for attacker in spammers:
-    for algo in algorithms:
-        algo.add_books(attacker.get_books())
+    tfidfAlgorithm.add_books(attacker.get_books())
+    spammerBooks += [bk.title for bk in attacker.get_books()]
+
+e = evaluator([])
+
+collectedData = []
+for i in range(len(users)):
+    collectedData.append({})
+    unguardedRecommendations = tfidfAlgorithm.recommend(users[i].likes)
+    collectedData[-1]["Unguarded Scores"] = e.evaluate(unguardedRecommendations, spammerBooks)
+    
+    tfidfAlgorithm.guard = "randomizationElement"
+    guardedRecommendations = tfidfAlgorithm.recommend(users[i].likes)
+    collectedData[-1]["Guarded Randomization Score (SPAM)"] = e.evaluate(guardedRecommendations, spammerBooks)
+    collectedData[-1]["Guarded Randomization Score (PURE)"] = e.evaluate(guardedRecommendations, pureRecommendations[i])
+    
+    tfidfAlgorithm.guard = "probability"
+    guardedRecommendations = tfidfAlgorithm.recommend(users[i].likes)
+    collectedData[-1]["Guarded Probability Scores (SPAM)"] = e.evaluate(guardedRecommendations, spammerBooks)
+    collectedData[-1]["Guarded Probability Score (PURE)"] = e.evaluate(guardedRecommendations, pureRecommendations[i])
+    tfidfAlgorithm.guard = False
+    
+
+minorKeys = list(collectedData[0]['Unguarded Scores'].keys())
+majorKeys = list(collectedData[0].keys())
+line = []
+with open("exported_data.csv", "w+") as writeFile:
+    for major in majorKeys:
+        for minor in minorKeys:
+            line.append(major + " " + minor)
+    
+    writeFile.write(",".join(line) + "\n")
+            
+    for dataSet in collectedData:
+        line = []
+        for major in majorKeys:
+            for minor in minorKeys:
+                line.append(str(dataSet[major][minor]))
+        writeFile.write(",".join(line) + "\n")
         
-for algo in algorithms:
-    print(algo.recommend(users[0].likes))

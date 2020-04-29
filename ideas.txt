@@ -1,0 +1,12 @@
+Better define Spam books..
+
+recommendation algorithm groups results - similar scores, 
+then you can get suspicious about extremely highly ranked documents
+Look at ways to target 
+
+
+threat model:
+	- Attacker will only copy the tags of the "liked books by the user"
+	- Can only create one book for all users
+
+written dates to guard against this - old books cannot copy new books

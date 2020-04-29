@@ -21,6 +21,8 @@ class evaluator:
                 countRel += 1
                 precision.append((countRel / (i + 1)))
         
+        if len(precision) == 0:
+            return 0
         return (sum(precision) / len(precision))
     
     
@@ -37,6 +39,8 @@ class evaluator:
             if rankings[i] in relDocs:
                 countRel += 1
                 precision += (countRel / (i + 1))
+        if countRel == 0:
+            return 0
         return (precision / countRel)
                 
             
@@ -49,12 +53,12 @@ class evaluator:
                 dcg += (1 / math.log(i + 2)) #Since i starts at 0 for us, but we need it to start at 1
         return dcg
     
-    def evaluate(self, rankings, relDocs = False):
-        if not relDocs:
+    def evaluate(self, rankings, relDocs = []):
+        if len(relDocs) == 0:
             relDocs = self.spam
         answer = {}
         answer["average precision"] = self.average_precision( rankings, relDocs)
         answer["precision @ 15"] = self.precisionK( rankings, 15 , relDocs)
         answer["reciprocal rank"] = self.rr( rankings, relDocs)
-        answer["dcg"] = self.dcg( rankings, relDocs)
+        #answer["dcg"] = self.dcg( rankings, relDocs)
         return answer        

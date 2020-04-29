@@ -4,16 +4,20 @@ Created on Tue Apr 28 22:05:08 2020
 
 @author: Richard Wang
 """
-from data.dataPuller import book
 
+from data.dataPuller import book
+from collections import defaultdict
+import random
 
 class spammer:
     
     def __init__ (self, targets, key):
-        self.tags = set()
-        self.add_targets(targets)
+        self.tags = []
         self.books = []
         self.key = key
+        self.tagCount = defaultdict(int)
+        
+        self.add_targets(targets)
         self.generate_books()
         
     def generate_books(self):
@@ -23,14 +27,18 @@ class spammer:
         for i in range(len(titles)):
             self.books.append(book())
             self.books[-1].title = str(self.key) + " __ " + titles[i]
-            self.books[-1].tags = list(self.tags)
+            self.books[-1].tags = [self.tags[:125][r] for r in random.sample(range(125), 100)]
             self.books[-1].publicationYear = publicationDates[i]
             self.books[-1].author = authors[i]
             
     def add_targets(self, newTargets):
+        self.tags = set(self.tags)
         for book in newTargets:
             for tag in book.tags:
                 self.tags.add(tag)
+                self.tagCount[tag] += 1
+        self.tags = list(self.tags)
+        self.tags.sort(key = lambda a : self.tagCount[a], reverse = True)
     
     def get_books(self):
         return self.books
