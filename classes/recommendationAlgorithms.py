@@ -5,7 +5,7 @@ Created on Mon Apr 27 12:37:11 2020
 @author: Richard Wang
 """
 from collections import defaultdict
-from data.dataPuller import pull_book_list, pull_tag_list
+from data.dataPuller import pull_tag_list
 import math
 
 '''
@@ -109,6 +109,7 @@ class nearestNeighbor:
         ranking.sort(key = lambda a : similarityScores[a], reverse = True)   
         return ranking[:min(self.numResults, len(ranking) - 1)]
     
+
 class hybrid:
     def __init__(self, bookList, numResults = 25):  # added a default value for numResults
         self.invertedIndex = defaultdict(set)
