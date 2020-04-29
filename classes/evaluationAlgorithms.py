@@ -30,6 +30,7 @@ class evaluator:
                 return (1 / (i + 1))
             
     def average_precision(self, rankings, relDocs):
+        if(len(relDocs) < 1): raise ValueError("relDocs can't be null. leads to division by Zero") #Ran Across this error in testing
         countRel = 0
         precision = 0
         for i in range(len(rankings)):

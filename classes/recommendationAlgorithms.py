@@ -12,14 +12,13 @@ import math
 Simple content based recommendation System
 '''
 
-numResults = 25
-
 class TFIDF:
-    def __init__(self, bookList):
+    def __init__(self, bookList, numResults = 25):  # added a default value for numResults
         self.invertedIndex = defaultdict(set)
         self.dfTracker = defaultdict(int)
         self.numDocs = 0
         self.add_books(bookList)
+        self.numResults = numResults #added an instance variable for easy automation
     
     #Puts new books into the Inverted Index
     def add_books(self, books):
@@ -57,11 +56,11 @@ class TFIDF:
         ranking = list(bookWeights.keys())
         ranking.sort(key = lambda a : bookWeights[a], reverse = True)
         
-        return ranking[:min(numResults, len(ranking) - 1)]
+        return ranking[:min(self.numResults, len(ranking) - 1)]
     
 
 class nearestNeighbor:
-    def __init__(self, bookList):
+    def __init__(self, bookList, numResults = 25):  # added a default value for numResults
         self.tagRef = {} #gives an index to each tag we find
         self.bookData = {} #We're going to store the individual vectors of the books here
         #Using one hot encoding
@@ -69,6 +68,7 @@ class nearestNeighbor:
         for i in range(len(tagsList)):
             self.tagRef[tagsList[i]]= i
         self.add_books(bookList)
+        self.numResults = numResults #added an instance variable for easy automation
     
     def add_books(self, books):
         for book in books:
@@ -107,10 +107,10 @@ class nearestNeighbor:
                     similarityScores[key] += similarity
         ranking = list(similarityScores.keys())
         ranking.sort(key = lambda a : similarityScores[a], reverse = True)   
-        return ranking[:min(numResults, len(ranking) - 1)]
+        return ranking[:min(self.numResults, len(ranking) - 1)]
     
 class hybrid:
-    def __init__(self, bookList):
+    def __init__(self, bookList, numResults = 25):  # added a default value for numResults
         self.invertedIndex = defaultdict(set)
         self.bookData = {}
         self.tagRef = {}
@@ -120,6 +120,7 @@ class hybrid:
         self.dfTracker = defaultdict(int)
         self.numDocs = 0
         self.add_books(bookList)
+        self.numResults = numResults #added an instance variable for easy automation
     
     
     def add_books(self, books):
@@ -185,4 +186,4 @@ class hybrid:
         
         ranking = list(bookWeights.keys())
         ranking.sort(key = lambda a : (bookWeights[a] * similarityScores[a]), reverse = True)
-        return ranking[:min(numResults, len(ranking) - 1)]        
+        return ranking[:min(self.numResults, len(ranking) - 1)]        
